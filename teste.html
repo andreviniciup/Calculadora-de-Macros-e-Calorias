@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Code Typing Animation</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #282a36;
+      color: #f8f8f2;
+      padding: 20px;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+    }
+    #file-input {
+      width: 100%;
+      height: 200px;
+      background-color: #44475a;
+      color: #f8f8f2;
+      border: 1px solid #6272a4;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .code {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 16px;
+      border: 1px solid #44475a;
+      padding: 20px;
+      background-color: #282a36;
+    }
+    .keyword { color: #ff79c6; }
+    .string { color: #f1fa8c; }
+    .function { color: #50fa7b; }
+    .comment { color: #6272a4; }
+    #speed-control {
+      margin: 20px 0;
+    }
+    label, input, button {
+      color: #f8f8f2;
+      margin-right: 10px;
+    }
+    button {
+      background-color: #50fa7b;
+      color: #282a36;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Java Code Animator</h1>
+  <textarea id="file-input" placeholder="Cole o conteúdo do seu arquivo .java aqui"></textarea>
+  <div id="speed-control">
+    <label for="speed-slider">Velocidade de Digitação: </label>
+    <input type="range" id="speed-slider" min="10" max="200" value="50">
+    <span id="speed-value">50 ms</span>
+    <button id="start-animation">Iniciar Animação</button>
+  </div>
+  <div class="code" id="code-output"></div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('file-input');
+  const codeOutput = document.getElementById('code-output');
+  const speedSlider = document.getElementById('speed-slider');
+  const speedValue = document.getElementById('speed-value');
+  const startButton = document.getElementById('start-animation');
+
+  let speed = 50;
+  let codeContent = [];
+  let animationInterval;
+
+  function processJavaCode(code) {
+    const lines = code.split('\n');
+    const processedCode = [];
+    
+    const keywords = ['public', 'class', 'private', 'static', 'void', 'int', 'double', 'boolean', 'String', 'if', 'else', 'for', 'while', 'try', 'catch', 'throw', 'new', 'return', 'true', 'false', 'null'];
+    
+    lines.forEach(line => {
+      let lineContent = [];
+      let buffer = '';
+      let inString = false;
+      let inComment = false;
+
+      for (let i = 0; i < line.length; i++) {
+        if (inComment) {
+          buffer += line[i];
+          if (i === line.length - 1) {
+            lineContent.push({ text: buffer, type: 'comment' });
+          }
+        } else if (inString) {
+          buffer += line[i];
+          if (line[i] === '"' && line[i-1] !== '\\') {
+            inString = false;
+            lineContent.push({ text: buffer, type: 'string' });
+            buffer = '';
+          }
+        } else {
+          if (line[i] === '/' && line[i+1] === '/') {
+            if (buffer) {
+              lineContent.push({ text: buffer, type: 'normal' });
+              buffer = '';
+            }
+            inComment = true;
+            buffer += line.slice(i);
+            lineContent.push({ text: buffer, type: 'comment' });
+            break;
+          } else if (line[i] === '"') {
+            if (buffer) {
+              lineContent.push({ text: buffer, type: 'normal' });
+              buffer = '';
+            }
+            inString = true;
+            buffer += line[i];
+          } else if (/\s/.test(line[i])) {
+            if (buffer) {
+              if (keywords.includes(buffer)) {
+                lineContent.push({ text: buffer, type: 'keyword' });
+              } else if (/^[A-Z][a-zA-Z0-9]*$/.test(buffer)) {
+                lineContent.push({ text: buffer, type: 'function' });
+              } else {
+                lineContent.push({ text: buffer, type: 'normal' });
+              }
+              buffer = '';
+            }
+            lineContent.push({ text: line[i], type: 'normal' });
+          } else {
+            buffer += line[i];
+          }
+        }
+      }
+      
+      if (buffer && !inComment) {
+        if (keywords.includes(buffer)) {
+          lineContent.push({ text: buffer, type: 'keyword' });
+        } else if (/^[A-Z][a-zA-Z0-9]*$/.test(buffer)) {
+          lineContent.push({ text: buffer, type: 'function' });
+        } else {
+          lineContent.push({ text: buffer, type: 'normal' });
+        }
+      }
+      
+      lineContent.push({ text: '\n', type: 'normal' });
+      processedCode.push(...lineContent);
+    });
+    
+    return processedCode;
+  }
+
+  function typeCode() {
+    if (codeContent.length > 0) {
+      const part = codeContent.shift();
+      const span = document.createElement('span');
+      span.textContent = part.text;
+      if (part.type !== 'normal') {
+        span.className = part.type;
+      }
+      codeOutput.appendChild(span);
+    } else {
+      clearInterval(animationInterval);
+    }
+  }
+
+  speedSlider.addEventListener('input', function() {
+    speed = this.value;
+    speedValue.textContent = speed + " ms";
+    if (animationInterval) {
+      clearInterval(animationInterval);
+      animationInterval = setInterval(typeCode, speed);
+    }
+  });
+
+  startButton.addEventListener('click', function() {
+    codeOutput.innerHTML = '';
+    codeContent = processJavaCode(fileInput.value);
+    if (animationInterval) {
+      clearInterval(animationInterval);
+    }
+    animationInterval = setInterval(typeCode, speed);
+  });
+</script>
+
+</body>
+</html>

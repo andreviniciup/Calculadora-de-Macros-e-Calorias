@@ -4,11 +4,11 @@ public class CalculadoraObjetivo {
 
     public static double ajustarCalorias(double tdee, String objetivo) {
         switch (objetivo) {
-            case "perder":
+            case "perder peso":
                 return tdee * (1 - DEFICIT_PERCENTUAL);
-            case "ganhar":
+            case "ganhar peso":
                 return tdee * (1 + SUPERAVIT_PERCENTUAL);
-            case "manter":
+            case "manter peso":
             default:
                 return tdee;
         }

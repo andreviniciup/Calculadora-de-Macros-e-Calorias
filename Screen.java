@@ -50,11 +50,11 @@ public class Screen extends JFrame {
         addComponent(sexoCombo, 1, 4, gbc);
 
         addComponent(new JLabel("Nível de Atividade:"), 0, 5, gbc);
-        atividadeCombo = new JComboBox<>(new String[]{"Sedentário", "Levemente Ativo", "Moderadamente Ativo", "Muito Ativo", "Extremamente Ativo"});
+        atividadeCombo = new JComboBox<>(new String[]{"sedentário", "leve", "moderado", "ativo", "muito ativo"});
         addComponent(atividadeCombo, 1, 5, gbc);
 
         addComponent(new JLabel("Objetivo:"), 0, 6, gbc);
-        objetivoCombo = new JComboBox<>(new String[]{"Perder Peso", "Manter Peso", "Ganhar Peso"});
+        objetivoCombo = new JComboBox<>(new String[]{"perder Peso", "manter Peso", "ganhar peso"});
         addComponent(objetivoCombo, 1, 6, gbc);
 
         calcularButton = new JButton("Calcular");

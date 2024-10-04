@@ -1,7 +1,7 @@
 public class CalculadoraTDEE {
     public static double calcularTDEE(double tmb, String nivelAtividade) {
         switch (nivelAtividade.toLowerCase()) {
-            case "sedentario":
+            case "sedentário":
                 return tmb * 1.2;
             case "leve":
                 return tmb * 1.375;
